@@ -7,7 +7,7 @@ ref_point = []
 
 def shape_selection(event, x, y, flags, param):
     # grab references to the global variables
-    global ref_point, crop
+    global ref_point, coordonnees, rectangle
 
     # if the left mouse button was clicked, record the starting
     # (x, y) coordinates and indicate that cropping is being performed
@@ -20,9 +20,29 @@ def shape_selection(event, x, y, flags, param):
         # the cropping operation is finished
         ref_point.append((x, y))
         print(ref_point)
+        # display rectangle image
+        print("y1 {} y2 {} x1 {} x2 {}".format(ref_point[0][1], ref_point[1][1],ref_point[0][0],ref_point[1][0] ))
+        coordonnees = "y1_{}_y2_{}_x1_{}_x2_{}".format(ref_point[0][1], ref_point[1][1],ref_point[0][0],ref_point[1][0])
+        x1 = ref_point[0][0]
+        x2 = ref_point[1][0]
+        y1 = ref_point[0][1]
+        y2 = ref_point[1][1]
+        if(x1 > x2):
+            x1 = ref_point[1][0]
+            x2 = ref_point[0][0]
+        if(y1 > y2):
+            y1 = ref_point[1][1]
+            y2 = ref_point[0][1]
+
+        rectangle = image[y1:y2, x1:x2].copy()
+        cv2.imshow("rectangle", rectangle)
+
         # draw a rectangle around the region of interest
         cv2.rectangle(image, ref_point[0], ref_point[1], (0, 255, 0), 2)
         cv2.imshow("image", image)
+
+
+
 
 
 # construct the argument parser and parse the arguments
@@ -47,8 +67,11 @@ while True:
     if key == ord("r"):
         image = clone.copy()
 
-    # if the 'c' key is pressed, break from the loop
     elif key == ord("c"):
+        cv2.imwrite("{}_{}".format(coordonnees, '.jpg'), rectangle)
+
+    # if the 'q' key is pressed, break from the loop
+    elif key == ord("q"):
         break
 
 # close all open windows
